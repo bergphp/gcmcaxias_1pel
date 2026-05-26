@@ -156,17 +156,39 @@
         }
 
         document.getElementById('btnCamera').onclick = async () => {
-            try {
-                stream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: 'environment' }
-                });
-                video.srcObject = stream;
-                document.getElementById('btnCamera').style.display = 'none';
-                document.getElementById('btnCapturar').style.display = 'block';
-            } catch (err) {
-                alert('Erro ao acessar câmera: ' + err.message);
+    try {
+        // Testa se o navegador suporta
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            alert('Seu navegador não suporta acesso à câmera. Use Chrome, Safari ou Firefox atualizado.');
+            return;
+        }
+
+        stream = await navigator.mediaDevices.getUserMedia({
+            video: { 
+                facingMode: { ideal: 'environment' }, // câmera traseira
+                width: { ideal: 1280 },
+                height: { ideal: 720 }
             }
-        };
+        });
+        
+        video.srcObject = stream;
+        document.getElementById('btnCamera').style.display = 'none';
+        document.getElementById('btnCapturar').style.display = 'block';
+        
+    } catch (err) {
+        console.error(err);
+        
+        if (err.name === 'NotAllowedError') {
+            alert('Permissão negada. Libera a câmera nas configurações do navegador e recarrega a página.');
+        } else if (err.name === 'NotFoundError') {
+            alert('Nenhuma câmera encontrada no dispositivo.');
+        } else if (err.name === 'NotSecureError') {
+            alert('Erro: A câmera só funciona em HTTPS ou localhost. Abre isso num servidor.');
+        } else {
+            alert('Erro ao abrir câmera: ' + err.message);
+        }
+    }
+};
 
         document.getElementById('btnCapturar').onclick = () => {
             canvas.width = video.videoWidth;
