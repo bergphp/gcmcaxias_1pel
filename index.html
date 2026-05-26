@@ -209,36 +209,7 @@
             location.reload();
         };
 
-        async function corrigir() {
-            const gabarito = [];
-            for (let i = 0; i < numQuestoes; i++) {
-                const val = document.getElementById(`g${i}`).value.toUpperCase();
-                if (!val.match(/[ABCDE]/)) {
-                    alert(`Questão ${i+1} inválida. Use A, B, C, D ou E`);
-                    return;
-                }
-                gabarito.push(val);
-            }
-
-            document.getElementById('loading').classList.add('show');
-
-            try {
-                const { data: { text } = await Tesseract.recognize(canvas, 'por+eng', {
-                    logger: m => console.log(m)
-                });
-
-                // Lógica simples: procura A,B,C,D,E no texto
-                // Pra 100% de precisão ideal é treinar um modelo ou usar template matching
-                respostasCapturadas = extrairRespostas(text);
-
-                calcularNota(gabarito, respostasCapturadas);
-
-            } catch (err) {
-                alert('Erro ao processar imagem: ' + err.message);
-            }
-
-            document.getElementById('loading').classList.remove('show');
-        }
+        remove('show');
 
         function extrairRespostas(texto) {
             // Remove tudo que não é A-E e quebra em linhas
