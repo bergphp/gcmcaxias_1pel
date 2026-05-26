@@ -3,651 +3,241 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard de Vendas</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Corretor de Gabarito</title>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #f5f7fa; color: #333;
+            background: #f5f7fa; padding: 20px;
         }
-        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
-        
-        .header {
+       .container { max-width: 600px; margin: 0 auto; }
+
+        h1 { text-align: center; color: #333; margin-bottom: 20px; font-size: 22px; }
+
+       .card {
             background: white; padding: 20px; border-radius: 12px;
-            margin-bottom: 24px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;
-        }
-        .header h1 { font-size: 24px; color: #1a1a1a; }
-        .filtros { display: flex; gap: 10px; flex-wrap: wrap; }
-        .filtros button {
-            padding: 8px 16px; border: 1px solid #ddd; background: white;
-            border-radius: 6px; cursor: pointer; font-size: 14px;
-        }
-        .filtros button.active {
-            background: #667eea; color: white; border-color: #667eea;
-        }
-        .filtros button:hover { background: #f0f0f0; }
-        .filtros button.active:hover { background: #5568d3; }
-
-        .alerta-meta {
-            background: #fff3cd; border: 1px solid #ffc107; color: #856404;
-            padding: 12px 16px; border-radius: 8px; margin-bottom: 20px;
-            display: none; align-items: center; gap: 10px; animation: pulse 2s infinite;
-        }
-        .alerta-meta.show { display: flex; }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px;
         }
 
-        .meta-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white; padding: 24px; border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); margin-bottom: 24px;
+       .camera-area {
+            width: 100%; height: 300px; background: #000; border-radius: 8px;
+            overflow: hidden; position: relative; margin-bottom: 12px;
         }
-        .meta-header {
-            display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;
-        }
-        .meta-header h3 { font-size: 18px; }
-        .btn-meta-group { display: flex; gap: 10px; flex-wrap: wrap; }
-        .btn-meta {
-            background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3);
-            color: white; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px;
-        }
-        .btn-meta:hover { background: rgba(255,255,255,0.3); }
-        .whatsapp-btn {
-            background: #25D366; color: white; border: none;
-            padding: 8px 16px; border-radius: 6px; cursor: pointer;
-            font-weight: bold; display: flex; align-items: center; gap: 6px; font-size: 14px;
-        }
-        .whatsapp-btn:hover { background: #1da851; }
-        .meta-info { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px; }
-        .meta-info strong { font-size: 20px; }
-        .progress-bar {
-            width: 100%; height: 12px; background: rgba(255,255,255,0.2);
-            border-radius: 10px; overflow: hidden; margin-bottom: 12px;
-        }
-        .progress-fill {
-            height: 100%; background: white; border-radius: 10px;
-            transition: width 0.5s ease; box-shadow: 0 0 10px rgba(255,255,255,0.5);
-        }
-        .meta-footer {
-            display: flex; justify-content: space-between; font-size: 13px; opacity: 0.9;
-        }
-        .meta-detalhes {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;
-        }
-        .meta-box {
-            background: rgba(255,255,255,0.15); padding: 16px; border-radius: 8px;
-        }
-        .meta-box h4 { font-size: 13px; opacity: 0.8; margin-bottom: 8px; font-weight: normal; }
-        .meta-box .valor { font-size: 18px; font-weight: bold; }
-        .meta-box .sub { font-size: 12px; opacity: 0.7; margin-top: 4px; }
+        video, canvas { width: 100%; height: 100%; object-fit: cover; }
+        canvas { display: none; }
 
-        .cards {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px; margin-bottom: 24px;
+       .btn {
+            width: 100%; padding: 14px; background: #667eea; color: white;
+            border: none; border-radius: 8px; font-size: 16px; font-weight: bold;
+            cursor: pointer; margin-bottom: 10px;
         }
-        .card {
-            background: white; padding: 24px; border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
-        .card h3 {
-            font-size: 14px; color: #666; margin-bottom: 12px; font-weight: 500;
-        }
-        .card .valor {
-            font-size: 32px; font-weight: bold; color: #1a1a1a; margin-bottom: 8px;
-        }
-        .card .desc { font-size: 13px; color: #999; }
+       .btn:hover { background: #5568d3; }
+       .btn-secondary { background: #6c757d; }
+       .btn-secondary:hover { background: #5a6268; }
+       .btn-success { background: #10b981; }
+       .btn-success:hover { background: 0d9f6e; }
 
-        .grid-2 {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;
+       .gabarito-input {
+            display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;
+            margin-top: 12px;
         }
-        .chart-card, .comparativo-card, .ranking-card, .historico-metas, .tendencia-card {
-            background: white; padding: 24px; border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
-        .chart-card h3, .comparativo-card h3, .ranking-card h3, .historico-metas h3, .tendencia-card h3 {
-            margin-bottom: 20px; color: #333; font-size: 18px;
+       .gabarito-input input {
+            padding: 10px; text-align: center; text-transform: uppercase;
+            border: 2px solid #ddd; border-radius: 6px; font-size: 16px;
         }
 
-        .comparativo-header {
-            display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;
+       .resultado {
+            display: none; text-align: center;
         }
-        .legenda { display: flex; gap: 20px; font-size: 14px; }
-        .legenda-item { display: flex; align-items: center; gap: 8px; }
-        .legenda-cor {
-            width: 16px; height: 16px; border-radius: 4px;
+       .resultado.show { display: block; }
+       .nota {
+            font-size: 48px; font-weight: bold; color: #667eea; margin: 20px 0;
         }
-        .totais {
-            display: flex; gap: 30px; margin-bottom: 20px;
-            padding: 16px; background: #f8f9fa; border-radius: 8px; flex-wrap: wrap;
+       .detalhe {
+            display: flex; justify-content: space-around; margin-bottom: 20px;
         }
-        .total-item { flex: 1; min-width: 120px; }
-        .total-item .label { font-size: 13px; color: #666; margin-bottom: 4px; }
-        .total-item .valor { font-size: 24px; font-weight: bold; color: #1a1a1a; }
-        .total-item .variacao { font-size: 14px; font-weight: 600; }
+       .detalhe-item {
+            text-align: center;
+        }
+       .detalhe-item.num {
+            font-size: 32px; font-weight: bold;
+        }
+       .detalhe-item.acertos.num { color: #10b981; }
+       .detalhe-item.erros.num { color: #ef4444; }
 
-        .ranking-item {
-            display: flex; align-items: center; padding: 16px;
-            border-bottom: 1px solid #f0f0f0;
+       .loading {
+            text-align: center; padding: 20px; display: none;
         }
-        .ranking-item:last-child { border-bottom: none; }
-        .ranking-pos {
-            width: 32px; height: 32px; border-radius: 50%;
-            background: #667eea; color: white; display: flex;
-            align-items: center; justify-content: center; font-weight: bold;
-            margin-right: 16px; flex-shrink: 0;
+       .loading.show { display: block; }
+       .spinner {
+            border: 4px solid #f3f3f3; border-top: 4px solid #667eea;
+            border-radius: 50%; width: 40px; height: 40px;
+            animation: spin 1s linear infinite; margin: 0 auto 12px;
         }
-        .ranking-info { flex: 1; }
-        .ranking-info .nome { font-weight: 600; color: #333; margin-bottom: 4px; }
-        .ranking-info .qtd { font-size: 13px; color: #999; }
-        .ranking-valor { font-weight: bold; color: #667eea; font-size: 16px; }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
 
-        .historico-item {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 16px; border-bottom: 1px solid #f0f0f0;
-        }
-        .historico-item:last-child { border-bottom: none; }
-        .historico-mes { font-weight: 600; color: #333; min-width: 80px; }
-        .historico-barra {
-            flex: 1; height: 8px; background: #f0f0f0; border-radius: 10px;
-            margin: 0 16px; overflow: hidden; position: relative;
-        }
-        .historico-fill {
-            height: 100%; border-radius: 10px; transition: width 0.5s ease;
-        }
-        .historico-fill.sucesso { background: #10b981; }
-        .historico-fill.falhou { background: #ef4444; }
-        .historico-valores { text-align: right; min-width: 140px; }
-        .historico-valores .perc { font-weight: bold; font-size: 16px; }
-        .historico-valores .sub { font-size: 12px; color: #999; }
-
-        .modal {
-            display: none; position: fixed; z-index: 200; left: 0; top: 0;
-            width: 100%; height: 100%; background: rgba(0,0,0,0.5);
-            align-items: center; justify-content: center;
-        }
-        .modal.show { display: flex; }
-        .modal-content {
-            background: white; padding: 30px; border-radius: 12px;
-            width: 90%; max-width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-        }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .modal-header h3 { color: #333; }
-        .close { background: none; border: none; font-size: 28px; cursor: pointer; color: #999; }
-        .input-group { margin-bottom: 16px; }
-        .input-group label { display: block; margin-bottom: 6px; color: #555; font-weight: bold; }
-        .input-group input {
-            width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 16px;
-        }
-        .modal-actions { display: flex; gap: 12px; margin-top: 24px; }
-        .btn-cancel { flex: 1; padding: 12px; background: #f0f0f0; border: none; border-radius: 6px; cursor: pointer; }
-        .btn-save { flex: 1; padding: 12px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
-
-        @media (max-width: 1024px) {
-            .grid-2 { grid-template-columns: 1fr; }
-        }
-        @media (max-width: 768px) {
-            .meta-detalhes { grid-template-columns: 1fr; }
-            .header { flex-direction: column; align-items: flex-start; }
-            .cards { grid-template-columns: 1fr; }
-            .totais { flex-direction: column; gap: 16px; }
+       .info {
+            background: #e7f3ff; padding: 12px; border-radius: 8px;
+            font-size: 14px; color: #004085; margin-bottom: 16px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>📊 Dashboard de Vendas</h1>
-            <div class="filtros">
-                <button onclick="filtrar('7dias')" class="active">7 dias</button>
-                <button onclick="filtrar('30dias')">30 dias</button>
-                <button onclick="filtrar('mes')">Este mês</button>
-                <button onclick="filtrar('ano')">Este ano</button>
+        <h1>📷 Corretor de Gabarito</h1>
+
+        <div class="card">
+            <div class="info">
+                <strong>Como usar:</strong><br>
+                1. Clique em "Abrir Câmera"<br>
+                2. Posicione o cartão resposta na tela<br>
+                3. Clique em "Capturar"<br>
+                4. Digite o gabarito oficial e clique em "Corrigir"
             </div>
+
+            <div class="camera-area">
+                <video id="video" autoplay playsinline></video>
+                <canvas id="canvas"></canvas>
+            </div>
+
+            <button class="btn" id="btnCamera">📷 Abrir Câmera</button>
+            <button class="btn btn-success" id="btnCapturar" style="display:none;">📸 Capturar</button>
+            <button class="btn btn-secondary" id="btnRecapturar" style="display:none;">🔄 Tirar Outra Foto</button>
         </div>
 
-        <div class="alerta-meta" id="alertaMeta">
-            <span style="font-size:24px;">⚠️</span>
-            <div>
-                <strong>Meta quase batida!</strong>
-                <div style="font-size:13px;">Você já atingiu 80% da meta mensal. Faltam apenas R$ <span id="alertaFaltante">0,00</span></div>
-            </div>
+        <div class="card" id="cardGabarito" style="display:none;">
+            <h3>Digite o Gabarito Oficial</h3>
+            <p style="font-size: 14px; color: #666; margin-bottom: 12px;">
+                Use A, B, C, D, E. Ex: ABCDEABCDE
+            </p>
+            <div class="gabarito-input" id="gabaritoInput"></div>
+            <button class="btn" style="margin-top: 16px;" onclick="corrigir()">✅ Corrigir</button>
         </div>
 
-        <div class="meta-card">
-            <div class="meta-header">
-                <h3>🎯 Meta de Vendas - <span id="metaMesAno"></span></h3>
-                <div class="btn-meta-group">
-                    <button class="whatsapp-btn" onclick="compartilharWhatsApp()">
-                        📱 WhatsApp
-                    </button>
-                    <button class="btn-meta" onclick="abrirModalMeta()">Definir Meta</button>
-                </div>
-            </div>
-            <div class="meta-info">
-                <div>
-                    <div style="opacity:0.8;font-size:13px;">Atual</div>
-                    <strong id="metaAtual">R$ 0,00</strong>
-                </div>
-                <div style="text-align:right;">
-                    <div style="opacity:0.8;font-size:13px;">Meta</div>
-                    <strong id="metaValor">R$ 0,00</strong>
-                </div>
-            </div>
-            <div class="progress-bar">
-                <div class="progress-fill" id="metaProgress" style="width:0%"></div>
-            </div>
-            <div class="meta-footer">
-                <span id="metaPercentual">0% atingido</span>
-                <span id="metaFaltante">Faltam R$ 0,00</span>
-            </div>
-            
-            <div class="meta-detalhes">
-                <div class="meta-box">
-                    <h4>📈 Projeção de Fechamento</h4>
-                    <div class="valor" id="projecaoValor">R$ 0,00</div>
-                    <div class="sub" id="projecaoPerc">0% da meta</div>
-                    <div class="sub" id="projecaoMedia">Média: R$ 0,00/dia</div>
-                </div>
-                <div class="meta-box">
-                    <h4>📅 Dias Restantes</h4>
-                    <div class="valor" id="diasRestantes">0 dias</div>
-                    <div class="sub" id="projecaoStatus">-</div>
-                </div>
-            </div>
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Lendo respostas... aguarde</p>
         </div>
 
-        <div class="cards">
-            <div class="card">
-                <h3>Usuários Ativos</h3>
-                <div class="valor" id="cardUsuarios">0</div>
-                <div class="desc">+0 este mês</div>
-            </div>
-            <div class="card">
-                <h3 id="cardVendasTitulo">Vendas - Últimos 7 dias</h3>
-                <div class="valor" id="cardVendas">R$ 0,00</div>
-                <div class="desc" id="cardVendasDesc">0 pedidos</div>
-            </div>
-            <div class="card">
-                <h3>Tickets Abertos</h3>
-                <div class="valor" id="cardTickets">0</div>
-                <div class="desc" id="cardTicketsDesc">0 urgentes</div>
-            </div>
-            <div class="card">
-                <h3>Taxa de Conversão</h3>
-                <div class="valor" id="cardTaxa">0%</div>
-                <div class="desc" id="cardTaxaDesc">+0% vs anterior</div>
-            </div>
-        </div>
-
-        <div class="grid-2">
-            <div class="chart-card">
-                <h3 id="tituloGrafico">Vendas - Últimos 7 dias</h3>
-                <canvas id="vendasChart"></canvas>
-            </div>
-            <div class="comparativo-card">
-                <div class="comparativo-header">
-                    <h3>Comparativo Mensal</h3>
-                    <div class="legenda">
-                        <div class="legenda-item">
-                            <div class="legenda-cor" style="background:#667eea;"></div>
-                            <span id="legendaAtual">Atual</span>
-                        </div>
-                        <div class="legenda-item">
-                            <div class="legenda-cor" style="background:#cbd5e0;"></div>
-                            <span id="legendaAnterior">Anterior</span>
-                        </div>
-                    </div>
+        <div class="card resultado" id="resultado">
+            <h3>Resultado</h3>
+            <div class="nota" id="nota">0/0</div>
+            <div class="detalhe">
+                <div class="detalhe-item acertos">
+                    <div class="num" id="acertos">0</div>
+                    <div>Acertos</div>
                 </div>
-                <div class="totais">
-                    <div class="total-item">
-                        <div class="label">Mês Atual</div>
-                        <div class="valor" id="totalAtualTexto">R$ 0,00</div>
-                    </div>
-                    <div class="total-item">
-                        <div class="label">Mês Anterior</div>
-                        <div class="valor" id="totalAnteriorTexto">R$ 0,00</div>
-                    </div>
-                    <div class="total-item">
-                        <div class="label">Variação</div>
-                        <div class="variacao" id="variacaoTexto">0%</div>
-                    </div>
+                <div class="detalhe-item erros">
+                    <div class="num" id="erros">0</div>
+                    <div>Erros</div>
                 </div>
-                <canvas id="comparativoChart"></canvas>
             </div>
-        </div>
-
-        <div class="grid-2">
-            <div class="ranking-card">
-                <h3>🏆 Produtos Mais Vendidos</h3>
-                <div id="rankingLista"></div>
-            </div>
-            <div class="historico-metas">
-                <h3>📊 Histórico de Metas - Últimos 6 meses</h3>
-                <div id="historicoLista"></div>
-            </div>
-        </div>
-
-        <div class="tendencia-card">
-            <h3>📈 Tendência de Vendas - Últimos 6 meses</h3>
-            <canvas id="tendenciaChart"></canvas>
+            <button class="btn" onclick="location.reload()">🔄 Nova Correção</button>
         </div>
     </div>
-
-    <div class="modal" id="modalMeta">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Definir Meta Mensal</h3>
-                <button class="close" onclick="fecharModalMeta()">&times;</button>
-            </div>
-            <form id="formMeta">
-                <div class="input-group">
-                    <label>Mês/Ano</label>
-                    <input type="month" id="metaMesInput" required>
-                </div>
-                <div class="input-group">
-                    <label>Valor da Meta R$</label>
-                    <input type="number" id="metaValorInput" step="0.01" min="0" required placeholder="50000.00">
-                </div>
-                <div class="modal-actions">
-                    <button type="button" class="btn-cancel" onclick="fecharModalMeta()">Cancelar</button>
-                    <button type="submit" class="btn-save">Salvar</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <audio id="somNotificacao" preload="auto">
-        <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT" type="audio/wav">
-    </audio>
 
     <script>
-        const API_DASHBOARD = 'api_dashboard.php';
-        const API_META = 'api_metas.php';
-        
-        let chartVendas = null;
-        let chartComparativo = null;
-        let chartTendencia = null;
-        let periodoAtual = '7dias';
-        let notificou80 = false;
-        let notificou100 = false;
-        let dadosMetaGlobal = null;
+        let stream = null;
+        let respostasCapturadas = [];
+        let numQuestoes = 10; // Altere aqui se quiser mais questões
 
-        if ('Notification' in window && Notification.permission === 'default') {
-            Notification.requestPermission();
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // Cria inputs do gabarito
+        const gabaritoDiv = document.getElementById('gabaritoInput');
+        for (let i = 0; i < numQuestoes; i++) {
+            gabaritoDiv.innerHTML += `<input type="text" maxlength="1" id="g${i}" placeholder="${i+1}">`;
         }
 
-        function tocarSom() {
-            const audio = document.getElementById('somNotificacao');
-            audio.play().catch(e => console.log('Áudio bloqueado'));
-        }
-
-        function enviarNotificacao(titulo, corpo) {
-            if ('Notification' in window && Notification.permission === 'granted') {
-                new Notification(titulo, {
-                    body: corpo,
-                    icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y="80" font-size="80">🎯</text></svg>'
+        document.getElementById('btnCamera').onclick = async () => {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: 'environment' }
                 });
-                tocarSom();
+                video.srcObject = stream;
+                document.getElementById('btnCamera').style.display = 'none';
+                document.getElementById('btnCapturar').style.display = 'block';
+            } catch (err) {
+                alert('Erro ao acessar câmera: ' + err.message);
             }
-        }
+        };
 
-        function compartilharWhatsApp() {
-            if (!dadosMetaGlobal) return;
-            
-            const percentual = dadosMetaGlobal.percentual;
-            const atual = dadosMetaGlobal.atual;
-            const meta = dadosMetaGlobal.valor;
-            const mes = dadosMetaGlobal.mes_ano;
-            
-            let mensagem = '';
-            if (percentual >= 100) {
-                mensagem = `🎉 *Meta Batida!* 🎉%0A%0A`;
-                mensagem += `✅ ${mes}%0A`;
-                mensagem += `💰 Atingido: R$ ${atual}%0A`;
-                mensagem += `🎯 Meta: R$ ${meta}%0A`;
-                mensagem += `%0AParabéns equipe! 🚀`;
-            } else if (percentual >= 80) {
-                mensagem = `⚠️ *Meta quase batida!* ⚠️%0A%0A`;
-                mensagem += `📊 ${mes}%0A`;
-                mensagem += `💰 Atual: R$ ${atual}%0A`;
-                mensagem += `🎯 Meta: R$ ${meta}%0A`;
-                mensagem += `📈 Progresso: ${percentual}%0A`;
-                mensagem += `💵 Faltam: R$ ${dadosMetaGlobal.faltante}%0A`;
-                mensagem += `%0AVamos fechar! 💪`;
-            } else {
-                mensagem = `📊 *Status da Meta - ${mes}*%0A%0A`;
-                mensagem += `💰 Atual: R$ ${atual}%0A`;
-                mensagem += `🎯 Meta: R$ ${meta}%0A`;
-                mensagem += `📈 Progresso: ${percentual}%0A`;
-                mensagem += `💵 Faltam: R$ ${dadosMetaGlobal.faltante}`;
-            }
-            
-            window.open(`https://wa.me/?text=${mensagem}`, '_blank');
-        }
+        document.getElementById('btnCapturar').onclick = () => {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            ctx.drawImage(video, 0, 0);
 
-        function filtrar(periodo) {
-            periodoAtual = periodo;
-            document.querySelectorAll('.filtros button').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            carregarDashboard();
-        }
+            video.style.display = 'none';
+            canvas.style.display = 'block';
 
-        async function carregarDashboard() {
-            const res = await fetch(`${API_DASHBOARD}?periodo=${periodoAtual}`);
-            const data = await res.json();
+            stream.getTracks().forEach(track => track.stop());
 
-            dadosMetaGlobal = data.meta;
+            document.getElementById('btnCapturar').style.display = 'none';
+            document.getElementById('btnRecapturar').style.display = 'block';
+            document.getElementById('cardGabarito').style.display = 'block';
+        };
 
-            document.getElementById('cardUsuarios').textContent = data.usuarios_ativos;
-            document.getElementById('cardVendasTitulo').textContent = 'Vendas - ' + data.label_periodo;
-            document.getElementById('cardVendas').textContent = 'R$ ' + data.vendas_periodo;
-            document.getElementById('cardVendasDesc').textContent = data.pedidos_periodo + ' pedidos';
-            document.getElementById('cardTickets').textContent = data.tickets_abertos;
-            document.getElementById('cardTicketsDesc').textContent = data.tickets_urgentes + ' urgentes';
-            document.getElementById('cardTaxa').textContent = data.taxa_conversao + '%';
-            document.getElementById('cardTaxaDesc').textContent = '+' + data.variacao_taxa + '% vs anterior';
+        document.getElementById('btnRecapturar').onclick = () => {
+            location.reload();
+        };
 
-            document.getElementById('metaMesAno').textContent = data.meta.mes_ano;
-            document.getElementById('metaAtual').textContent = 'R$ ' + data.meta.atual;
-            document.getElementById('metaValor').textContent = 'R$ ' + data.meta.valor;
-            document.getElementById('metaProgress').style.width = Math.min(data.meta.percentual, 100) + '%';
-            document.getElementById('metaPercentual').textContent = data.meta.percentual + '% atingido';
-            document.getElementById('metaFaltante').textContent = 'Faltam R$ ' + data.meta.faltante;
-            
-            if (data.meta.percentual >= 100) {
-                document.getElementById('metaProgress').style.background = '#10b981';
-                document.getElementById('metaFaltante').textContent = '🎉 Meta batida!';
-                if (!notificou100) {
-                    enviarNotificacao('🎉 Meta Batida!', `Parabéns! Você atingiu R$ ${data.meta.atual} de R$ ${data.meta.valor}`);
-                    notificou100 = true;
+        async function corrigir() {
+            const gabarito = [];
+            for (let i = 0; i < numQuestoes; i++) {
+                const val = document.getElementById(`g${i}`).value.toUpperCase();
+                if (!val.match(/[ABCDE]/)) {
+                    alert(`Questão ${i+1} inválida. Use A, B, C, D ou E`);
+                    return;
                 }
+                gabarito.push(val);
             }
 
-            const alertaMeta = document.getElementById('alertaMeta');
-            if (data.meta.alerta_80) {
-                document.getElementById('alertaFaltante').textContent = data.meta.faltante;
-                alertaMeta.classList.add('show');
-                if (!notificou80) {
-                    enviarNotificacao('⚠️ Meta quase batida!', `Você já atingiu ${data.meta.percentual}% da meta. Faltam R$ ${data.meta.faltante}`);
-                    notificou80 = true;
-                }
-            } else {
-                alertaMeta.classList.remove('show');
+            document.getElementById('loading').classList.add('show');
+
+            try {
+                const { data: { text } = await Tesseract.recognize(canvas, 'por+eng', {
+                    logger: m => console.log(m)
+                });
+
+                // Lógica simples: procura A,B,C,D,E no texto
+                // Pra 100% de precisão ideal é treinar um modelo ou usar template matching
+                respostasCapturadas = extrairRespostas(text);
+
+                calcularNota(gabarito, respostasCapturadas);
+
+            } catch (err) {
+                alert('Erro ao processar imagem: ' + err.message);
             }
 
-            document.getElementById('projecaoValor').textContent = 'R$ ' + data.meta.projecao.valor;
-            document.getElementById('projecaoPerc').textContent = data.meta.projecao.percentual + '% da meta';
-            document.getElementById('projecaoMedia').textContent = 'Média: R$ ' + data.meta.projecao.media_diaria + '/dia';
-            document.getElementById('diasRestantes').textContent = data.meta.projecao.dias_restantes + ' dias';
-            
-            const projStatus = document.getElementById('projecaoStatus');
-            if (data.meta.projecao.percentual >= 100) {
-                projStatus.textContent = '✅ Deve bater a meta';
-                projStatus.style.color = '#10b981';
-            } else {
-                projStatus.textContent = '⚠️ Abaixo da meta';
-                projStatus.style.color = '#f59e0b';
-            }
-
-            document.getElementById('tituloGrafico').textContent = 'Vendas - ' + data.label_periodo;
-            if (chartVendas) chartVendas.destroy();
-            chartVendas = new Chart(document.getElementById('vendasChart'), {
-                type: 'line',
-                data: {
-                    labels: data.grafico.labels,
-                    datasets: [{
-                        label: 'Vendas R$',
-                        data: data.grafico.valores,
-                        borderColor: '#667eea',
-                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
-                        tension: 0.4,
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: { legend: { display: false } },
-                    scales: { y: { beginAtZero: true } }
-                }
-            });
-
-            document.getElementById('legendaAtual').textContent = data.comparativo.mes_atual_nome;
-            document.getElementById('legendaAnterior').textContent = data.comparativo.mes_anterior_nome;
-            document.getElementById('totalAtualTexto').textContent = 'R$ ' + data.comparativo.total_atual;
-            document.getElementById('totalAnteriorTexto').textContent = 'R$ ' + data.comparativo.total_anterior;
-            
-            const variacaoEl = document.getElementById('variacaoTexto');
-            if (data.comparativo.variacao >= 0) {
-                variacaoEl.style.color = '#10b981';
-                variacaoEl.textContent = '▲ +' + data.comparativo.variacao + '%';
-            } else {
-                variacaoEl.style.color = '#ef4444';
-                variacaoEl.textContent = '▼ ' + data.comparativo.variacao + '%';
-            }
-
-            if (chartComparativo) chartComparativo.destroy();
-            chartComparativo = new Chart(document.getElementById('comparativoChart'), {
-                type: 'bar',
-                data: {
-                    labels: data.comparativo.labels,
-                    datasets: [
-                        {
-                            label: data.comparativo.mes_atual_nome,
-                            data: data.comparativo.valores_atual,
-                            backgroundColor: '#667eea',
-                            borderRadius: 4
-                        },
-                        {
-                            label: data.comparativo.mes_anterior_nome,
-                            data: data.comparativo.valores_anterior,
-                            backgroundColor: '#cbd5e0',
-                            borderRadius: 4
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    plugins: { legend: { display: false } },
-                    scales: { y: { beginAtZero: true }, x: { display: false } }
-                }
-            });
-
-            document.getElementById('historicoLista').innerHTML = data.historico_metas.map(h => `
-                <div class="historico-item">
-                    <div class="historico-mes">${h.mes}</div>
-                    <div class="historico-barra">
-                        <div class="historico-fill ${h.bateu ? 'sucesso' : 'falhou'}" 
-                             style="width:${Math.min(h.percentual, 100)}%"></div>
-                    </div>
-                    <div class="historico-valores">
-                        <div class="perc" style="color:${h.bateu ? '#10b981' : '#ef4444'}">${h.percentual}%</div>
-                        <div class="sub">R$ ${h.vendas.toFixed(2).replace('.', ',')} / R$ ${h.meta.toFixed(2).replace('.', ',')}</div>
-                    </div>
-                </div>
-            `).join('');
-
-            if (chartTendencia) chartTendencia.destroy();
-            chartTendencia = new Chart(document.getElementById('tendenciaChart'), {
-                type: 'line',
-                data: {
-                    labels: data.tendencia.labels,
-                    datasets: [
-                        {
-                            label: 'Vendas Realizadas',
-                            data: data.tendencia.vendas,
-                            borderColor: '#667eea',
-                            backgroundColor: 'rgba(102, 126, 234, 0.1)',
-                            tension: 0.4,
-                            fill: true,
-                            borderWidth: 3
-                        },
-                        {
-                            label: 'Meta',
-                            data: data.tendencia.metas,
-                            borderColor: '#10b981',
-                            borderDash: [5, 5],
-                            tension: 0.4,
-                            fill: false,
-                            borderWidth: 2
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    plugins: { legend: { display: true, position: 'bottom' } },
-                    scales: { y: { beginAtZero: true } }
-                }
-            });
-
-            const rankingDiv = document.getElementById('rankingLista');
-            if (data.ranking_produtos.length === 0) {
-                rankingDiv.innerHTML = '<div style="padding:20px;text-align:center;color:#999">Nenhuma venda no período</div>';
-            } else {
-                rankingDiv.innerHTML = data.ranking_produtos.map((p, i) => `
-                    <div class="ranking-item">
-                        <div class="ranking-pos">${i + 1}</div>
-                        <div class="ranking-info">
-                            <div class="nome">${p.nome}</div>
-                            <div class="qtd">${p.qtd} unidades vendidas</div>
-                        </div>
-                        <div class="ranking-valor">R$ ${parseFloat(p.total).toFixed(2).replace('.', ',')}</div>
-                    </div>
-                `).join('');
-            }
+            document.getElementById('loading').classList.remove('show');
         }
 
-        function abrirModalMeta() {
-            const hoje = new Date();
-            document.getElementById('metaMesInput').value = hoje.toISOString().slice(0, 7);
-            document.getElementById('modalMeta').classList.add('show');
+        function extrairRespostas(texto) {
+            // Remove tudo que não é A-E e quebra em linhas
+            const limpo = texto.toUpperCase().replace(/[^ABCDE\n]/g, '');
+            const linhas = limpo.split('\n').filter(l => l.length > 0);
+
+            // Pega primeira letra de cada linha
+            return linhas.slice(0, numQuestoes).map(l => l[0]);
         }
 
-        function fecharModalMeta() {
-            document.getElementById('modalMeta').classList.remove('show');
-            document.getElementById('formMeta').reset();
+        function calcularNota(gabarito, respostas) {
+            let acertos = 0;
+            for (let i = 0; i < gabarito.length; i++) {
+                if (gabarito[i] === respostas[i]) acertos++;
+            }
+
+            document.getElementById('acertos').textContent = acertos;
+            document.getElementById('erros').textContent = gabarito.length - acertos;
+            document.getElementById('nota').textContent = `${acertos}/${gabarito.length}`;
+            document.getElementById('resultado').classList.add('show');
         }
-
-        document.getElementById('formMeta').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const dados = {
-                mes_ano: document.getElementById('metaMesInput').value,
-                valor_meta: document.getElementById('metaValorInput').value
-            };
-            await fetch(API_META, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(dados)
-            });
-            fecharModalMeta();
-            carregarDashboard();
-        });
-
-        carregarDashboard();
-        setInterval(carregarDashboard, 60000);
     </script>
 </body>
 </html>
