@@ -3,174 +3,153 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador Copa 2026 - Todos os Jogos</title>
+    <title>Simulador Copa 2026 - Fase de Grupos</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        :root { --primary-color: #004d95; --secondary-color: #d4213d; }
+        :root { --primary-color: #006241; --secondary-color: #ffcc00; }
         body { background-color: #f0f2f5; font-family: sans-serif; }
-        .header { background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&q=80&w=1000'); background-size: cover; color: white; padding: 40px 0; text-align: center; margin-bottom: 30px; }
-        .grupo-container { background: white; border-radius: 12px; padding: 15px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        .grupo-header { background: var(--primary-color); color: white; margin: -15px -15px 15px -15px; padding: 10px; border-radius: 12px 12px 0 0; font-weight: bold; font-size: 1.2rem; }
-        .jogo-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; }
-        .jogo-item:last-child { border-bottom: none; }
-        .time-box { flex: 1; font-weight: 500; font-size: 0.9rem; }
-        .text-right { text-align: right; }
-        .placar-input { width: 45px; text-align: center; font-weight: bold; border: 2px solid #ddd; border-radius: 5px; margin: 0 5px; }
-        .placar-input:focus { border-color: var(--primary-color); outline: none; }
-        #resumo-fixed { position: sticky; top: 20px; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-height: 90vh; overflow-y: auto; }
-        .badge-data { font-size: 0.7rem; color: #777; display: block; }
+        .header { background: var(--primary-color); color: white; padding: 2rem 0; margin-bottom: 2rem; border-bottom: 5px solid var(--secondary-color); }
+        .nav-pills .nav-link.active { background-color: var(--primary-color); }
+        .nav-link { color: #333; font-weight: bold; }
+        .jogo-card { background: white; border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: space-between; }
+        .team-box { flex: 1; display: flex; align-items: center; }
+        .team-right { justify-content: flex-end; text-align: right; }
+        .team-name { font-weight: 600; font-size: 0.95rem; margin: 0 10px; }
+        .input-placar { width: 45px; height: 40px; text-align: center; font-weight: bold; font-size: 1.2rem; border: 2px solid #ddd; border-radius: 8px; }
+        .vs { font-weight: bold; color: #999; margin: 0 10px; }
+        #resumo-container { position: sticky; top: 20px; background: white; padding: 20px; border-radius: 12px; border-top: 5px solid var(--primary-color); max-height: 80vh; overflow-y: auto; }
+        .badge-grupo { background: #333; color: white; margin-bottom: 10px; display: inline-block; padding: 2px 10px; border-radius: 4px; font-size: 0.8rem; }
     </style>
 </head>
 <body>
 
-<div class="header">
-    <h1>SIMULADOR COPA DO MUNDO 2026</h1>
-    <p>Preencha os 72 jogos da Fase de Grupos</p>
+<div class="header text-center">
+    <h1>🏆 FIFA WORLD CUP 2026</h1>
+    <p>Simulador da Primeira Fase (48 Seleções)</p>
 </div>
 
 <div class="container-fluid px-4">
     <div class="row">
-        <!-- ÁREA DOS JOGOS -->
-        <div class="col-lg-8" id="container-grupos">
-            <!-- Os grupos serão gerados via JavaScript aqui -->
+        <!-- ÁREA DE JOGOS -->
+        <div class="col-lg-8">
+            <ul class="nav nav-pills mb-4 justify-content-center" id="pills-tab" role="tablist">
+                <li class="nav-item"><button class="nav-link active" data-bs-toggle="pill" data-bs-target="#rodada1">Rodada 1</button></li>
+                <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#rodada2">Rodada 2</button></li>
+                <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#rodada3">Rodada 3</button></li>
+            </ul>
+
+            <div class="tab-content" id="pills-tabContent">
+                <div class="tab-pane fade show active" id="rodada1"></div>
+                <div class="tab-pane fade" id="rodada2"></div>
+                <div class="tab-pane fade" id="rodada3"></div>
+            </div>
         </div>
 
-        <!-- ÁREA DO RESUMO -->
+        <!-- PAINEL DE VISUALIZAÇÃO -->
         <div class="col-lg-4">
-            <div id="resumo-fixed">
-                <h4 class="text-center mb-3">Suas Escolhas</h4>
-                <div id="lista-resumo" class="small text-muted text-center">
-                    Nenhum placar preenchido.
-                </div>
+            <div id="resumo-container" class="shadow">
+                <h4 class="text-center">Minhas Escolhas</h4>
                 <hr>
-                <div class="d-grid gap-2">
-                    <button class="btn btn-success" onclick="exportarDados()">Baixar Resumo (Texto)</button>
-                    <button class="btn btn-outline-danger btn-sm" onclick="limparTudo()">Resetar Tudo</button>
+                <div id="lista-resumo">
+                    <p class="text-muted text-center">Os placares aparecerão aqui conforme você preencher.</p>
                 </div>
+                <button class="btn btn-danger btn-sm w-100 mt-3" onclick="limparTudo()">Limpar Tudo</button>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-// BANCO DE DADOS DOS JOGOS (Exemplo simplificado com as principais seleções confirmadas e potes)
-// Em um cenário real, aqui entrariam todos os 72 confrontos.
-const dadosCopa = [
-    { grupo: "A", jogos: [
-        { id: "a1", t1: "México", t2: "África do Sul", data: "11/06" },
-        { id: "a2", t1: "Coreia do Sul", t2: "Tchéquia", data: "11/06" },
-        { id: "a3", t1: "México", t2: "Coreia do Sul", data: "16/06" },
-        { id: "a4", t1: "Tchéquia", t2: "África do Sul", data: "16/06" },
-        { id: "a5", t1: "África do Sul", t2: "Coreia do Sul", data: "24/06" },
-        { id: "a6", t1: "Tchéquia", t2: "México", data: "24/06" }
-    ]},
-    { grupo: "B", jogos: [
-        { id: "b1", t1: "Canadá", t2: "Bósnia", data: "12/06" },
-        { id: "b2", t1: "Catar", t2: "Suíça", data: "13/06" },
-        { id: "b3", t1: "Canadá", t2: "Catar", data: "17/06" },
-        { id: "b4", t1: "Suíça", t2: "Bósnia", data: "17/06" },
-        { id: "b5", t1: "Bósnia", t2: "Catar", data: "24/06" },
-        { id: "b6", t1: "Suíça", t2: "Canadá", data: "24/06" }
-    ]},
-    { grupo: "C", jogos: [
-        { id: "c1", t1: "Brasil", t2: "Marrocos", data: "13/06" },
-        { id: "c2", t1: "Haiti", t2: "Escócia", data: "13/06" },
-        { id: "c3", t1: "Brasil", t2: "Haiti", data: "19/06" },
-        { id: "c4", t1: "Escócia", t2: "Marrocos", data: "19/06" },
-        { id: "c5", t1: "Marrocos", t2: "Haiti", data: "24/06" },
-        { id: "c6", t1: "Escócia", t2: "Brasil", data: "24/06" }
-    ]},
-    { grupo: "D", jogos: [
-        { id: "d1", t1: "EUA", t2: "Paraguai", data: "12/06" },
-        { id: "d2", t1: "Austrália", t2: "Turquia", data: "13/06" },
-        { id: "d3", t1: "EUA", t2: "Austrália", data: "19/06" },
-        { id: "d4", t1: "Turquia", t2: "Paraguai", data: "19/06" },
-        { id: "d5", t1: "Paraguai", t2: "Austrália", data: "25/06" },
-        { id: "d6", t1: "Turquia", t2: "EUA", data: "25/06" }
-    ]}
-    // Nota: Adicionei 4 grupos como exemplo para o código não ficar gigante, 
-    // mas a lógica abaixo renderiza quantos grupos você colocar aqui.
+// Dados oficiais simplificados para o exemplo (Grupos A a L)
+const grupos = [
+    { nome: 'A', times: ['México', 'África do Sul', 'Coreia do Sul', 'Tchéquia'] },
+    { nome: 'B', times: ['Canadá', 'Bósnia e H.', 'Catar', 'Suíça'] },
+    { nome: 'C', times: ['Brasil', 'Marrocos', 'Haiti', 'Escócia'] },
+    { nome: 'D', times: ['EUA', 'Paraguai', 'Austrália', 'Turquia'] },
+    { nome: 'E', times: ['Alemanha', 'Curaçau', 'Costa do Marfim', 'Equador'] },
+    { nome: 'F', times: ['Holanda', 'Japão', 'Suécia', 'Tunísia'] },
+    { nome: 'G', times: ['Bélgica', 'Egito', 'Irã', 'Nova Zelândia'] },
+    { nome: 'H', times: ['Espanha', 'Cabo Verde', 'Arábia Saudita', 'Uruguai'] },
+    { nome: 'I', times: ['França', 'Senegal', 'Iraque', 'Noruega'] },
+    { nome: 'J', times: ['Argentina', 'Argélia', 'Áustria', 'Jordânia'] },
+    { nome: 'K', times: ['Portugal', 'RD Congo', 'Uzbequistão', 'Colômbia'] },
+    { nome: 'L', times: ['Inglaterra', 'Croácia', 'Gana', 'Panamá'] }
 ];
 
-// FUNÇÃO PARA GERAR O HTML AUTOMATICAMENTE
-function renderizarJogos() {
-    const container = document.getElementById('container-grupos');
-    let htmlGeral = "";
+function gerarJogos() {
+    const r1 = document.getElementById('rodada1');
+    const r2 = document.getElementById('rodada2');
+    const r3 = document.getElementById('rodada3');
 
-    dadosCopa.forEach(gp => {
-        let htmlGrupo = `<div class="grupo-container"><div class="grupo-header text-center">GRUPO ${gp.grupo}</div>`;
-        
-        gp.jogos.forEach(jogo => {
-            htmlGrupo += `
-                <div class="jogo-item" data-id="${jogo.id}">
-                    <div class="time-box text-right">${jogo.t1}</div>
-                    <div class="d-flex align-items-center">
-                        <input type="number" class="placar-input p1" oninput="salvar('${jogo.id}')">
-                        <span>x</span>
-                        <input type="number" class="placar-input p2" oninput="salvar('${jogo.id}')">
-                    </div>
-                    <div class="time-box">
-                        ${jogo.t2}
-                        <span class="badge-data">${jogo.data}</span>
-                    </div>
-                </div>`;
-        });
-        
-        htmlGrupo += `</div>`;
-        htmlGeral += htmlGrupo;
+    grupos.forEach(g => {
+        // Rodada 1: Time 1 x Time 2 | Time 3 x Time 4
+        r1.innerHTML += criarTemplateJogo(g.nome, g.times[0], g.times[1], `R1-${g.nome}-J1`);
+        r1.innerHTML += criarTemplateJogo(g.nome, g.times[2], g.times[3], `R1-${g.nome}-J2`);
+        // Rodada 2: Time 1 x Time 3 | Time 2 x Time 4
+        r2.innerHTML += criarTemplateJogo(g.nome, g.times[0], g.times[2], `R2-${g.nome}-J1`);
+        r2.innerHTML += criarTemplateJogo(g.nome, g.times[1], g.times[3], `R2-${g.nome}-J2`);
+        // Rodada 3: Time 4 x Time 1 | Time 2 x Time 3
+        r3.innerHTML += criarTemplateJogo(g.nome, g.times[3], g.times[0], `R3-${g.nome}-J1`);
+        r3.innerHTML += criarTemplateJogo(g.nome, g.times[1], g.times[2], `R3-${g.nome}-J2`);
     });
-
-    container.innerHTML = htmlGeral;
-    carregarDados();
 }
 
-// SALVAR NO LOCALSTORAGE
+function criarTemplateJogo(grupo, t1, t2, id) {
+    return `
+        <div class="jogo-card" data-id="${id}">
+            <div class="team-box team-right">
+                <span class="badge-grupo d-block d-md-none">Grupo ${grupo}</span>
+                <span class="team-name">${t1}</span>
+                <input type="number" min="0" class="input-placar placar-h" oninput="salvar('${id}')">
+            </div>
+            <span class="vs">X</span>
+            <div class="team-box">
+                <input type="number" min="0" class="input-placar placar-a" oninput="salvar('${id}')">
+                <span class="team-name">${t2}</span>
+            </div>
+        </div>
+    `;
+}
+
 function salvar(id) {
-    const linha = document.querySelector(`[data-id="${id}"]`);
-    const p1 = linha.querySelector('.p1').value;
-    const p2 = linha.querySelector('.p2').value;
-
-    const resultado = { p1, p2 };
-    localStorage.setItem('copa26_' + id, JSON.stringify(resultado));
+    const card = document.querySelector(`[data-id="${id}"]`);
+    const h = card.querySelector('.placar-h').value;
+    const a = card.querySelector('.placar-a').value;
+    localStorage.setItem(id, JSON.stringify({h, a}));
     atualizarResumo();
 }
 
-// CARREGAR DADOS AO ABRIR
-function carregarDados() {
-    dadosCopa.forEach(gp => {
-        gp.jogos.forEach(jogo => {
-            const salvo = localStorage.getItem('copa26_' + jogo.id);
-            if (salvo) {
-                const dados = JSON.parse(salvo);
-                const linha = document.querySelector(`[data-id="${jogo.id}"]`);
-                linha.querySelector('.p1').value = dados.p1;
-                linha.querySelector('.p2').value = dados.p2;
-            }
-        });
-    });
-    atualizarResumo();
-}
-
-// ATUALIZAR O PAINEL DE VISUALIZAÇÃO
 function atualizarResumo() {
     const lista = document.getElementById('lista-resumo');
-    let resumoHtml = "";
-    let cont = 0;
+    const cards = document.querySelectorAll('.jogo-card');
+    let html = "";
+    
+    cards.forEach(card => {
+        const id = card.getAttribute('data-id');
+        const h = card.querySelector('.placar-h').value;
+        const a = card.querySelector('.placar-a').value;
+        const t1 = card.querySelectorAll('.team-name')[0].innerText;
+        const t2 = card.querySelectorAll('.team-name')[1].innerText;
 
-    dadosCopa.forEach(gp => {
-        gp.jogos.forEach(jogo => {
-            const linha = document.querySelector(`[data-id="${jogo.id}"]`);
-            const v1 = linha.querySelector('.p1').value;
-            const v2 = linha.querySelector('.p2').value;
-
-            if (v1 !== "" && v2 !== "") {
-                resumoHtml += `<div class="border-bottom mb-1">${jogo.t1} <b>${v1} x ${v2}</b> ${jogo.t2}</div>`;
-                cont++;
-            }
-        });
+        if (h !== "" || a !== "") {
+            html += `<div class="small border-bottom py-1"><b>${t1}</b> ${h||0} x ${a||0} <b>${t2}</b></div>`;
+        }
     });
 
-    lista.innerHTML = cont > 0 ? resumoHtml : "Nenhum placar preenchido.";
+    lista.innerHTML = html || '<p class="text-muted text-center">Nenhum placar preenchido.</p>';
+}
+
+function carregar() {
+    document.querySelectorAll('.jogo-card').forEach(card => {
+        const id = card.getAttribute('data-id');
+        const salvo = localStorage.getItem(id);
+        if (salvo) {
+            const dados = JSON.parse(salvo);
+            card.querySelector('.placar-h').value = dados.h;
+            card.querySelector('.placar-a').value = dados.a;
+        }
+    });
+    atualizarResumo();
 }
 
 function limparTudo() {
@@ -180,26 +159,11 @@ function limparTudo() {
     }
 }
 
-// Função para a pessoa poder copiar ou salvar as escolhas
-function exportarDados() {
-    let texto = "MEUS PALPITES COPA 2026\n\n";
-    document.querySelectorAll('.jogo-item').forEach(item => {
-        const t1 = item.querySelector('.text-right').innerText;
-        const t2 = item.childNodes[5].innerText.split('\n')[0];
-        const p1 = item.querySelector('.p1').value;
-        const p2 = item.querySelector('.p2').value;
-        if(p1 !== "") texto += `${t1} ${p1} x ${p2} ${t2}\n`;
-    });
-    
-    const blob = new Blob([texto], { type: 'text/plain' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = 'meus_palpites_copa.txt';
-    link.click();
-}
+gerarJogos();
+carregar();
 
-renderizarJogos();
 </script>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
