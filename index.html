@@ -1,33 +1,252 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Login - Sistema Escolar</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/all.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Placares - Primeira Fase</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f4f7f6;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding-bottom: 50px;
+        }
+        .header-title {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 30px 0;
+            margin-bottom: 30px;
+            border-radius: 0 0 15px 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .rodada-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .rodada-title {
+            color: #1e3c72;
+            border-bottom: 2px solid #eef2f3;
+            padding-bottom: 8px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        .jogo-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+            padding: 8px;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+        .jogo-row:hover {
+            background-color: #f8f9fa;
+        }
+        .team-name {
+            font-weight: 500;
+            width: 120px;
+        }
+        .team-home { text-align: right; }
+        .team-away { text-align: left; }
+        .input-placar {
+            width: 50px;
+            text-align: center;
+            font-weight: bold;
+            border: 2px solid #ced4da;
+            border-radius: 6px;
+        }
+        .input-placar:focus {
+            border-color: #2a5298;
+            box-shadow: none;
+        }
+        .vs {
+            margin: 0 10px;
+            font-weight: bold;
+            color: #6c757d;
+        }
+        .painel-resumo {
+            background: #e9ecef;
+            border-left: 5px solid #1e3c72;
+            padding: 15px;
+            border-radius: 4px;
+        }
+    </style>
 </head>
-<body class="bg-light d-flex align-items-center" style="height: 100vh;">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-4">
-                <div class="card shadow">
+<body>
+
+<div class="container text-center header-title">
+    <h1>Simulador de Placares</h1>
+    <p class="mb-0">Primeira Fase - Os dados são salvos automaticamente!</p>
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-8">
+            
+            <div class="rodada-card">
+                <h3 class="rodada-title">1ª Rodada</h3>
+                
+                <div class="jogo-row" data-id="jogo1">
+                    <span class="team-name team-home">Brasil</span>
+                    <input type="number" min="0" class="form-control input-placar placar-home" oninput="salvarPlacar('jogo1')">
+                    <span class="vs">X</span>
+                    <input type="number" min="0" class="form-control input-placar placar-away" oninput="salvarPlacar('jogo1')">
+                    <span class="team-name team-away">Sérvia</span>
+                </div>
+
+                <div class="jogo-row" data-id="jogo2">
+                    <span class="team-name team-home">Suíça</span>
+                    <input type="number" min="0" class="form-control input-placar placar-home" oninput="salvarPlacar('jogo2')">
+                    <span class="vs">X</span>
+                    <input type="number" min="0" class="form-control input-placar placar-away" oninput="salvarPlacar('jogo2')">
+                    <span class="team-name team-away">Camarões</span>
+                </div>
+            </div>
+
+            <div class="rodada-card">
+                <h3 class="rodada-title">2ª Rodada</h3>
+                
+                <div class="jogo-row" data-id="jogo3">
+                    <span class="team-name team-home">Brasil</span>
+                    <input type="number" min="0" class="form-control input-placar placar-home" oninput="salvarPlacar('jogo3')">
+                    <span class="vs">X</span>
+                    <input type="number" min="0" class="form-control input-placar placar-away" oninput="salvarPlacar('jogo3')">
+                    <span class="team-name team-away">Suíça</span>
+                </div>
+
+                <div class="jogo-row" data-id="jogo4">
+                    <span class="team-name team-home">Camarões</span>
+                    <input type="number" min="0" class="form-control input-placar placar-home" oninput="salvarPlacar('jogo4')">
+                    <span class="vs">X</span>
+                    <input type="number" min="0" class="form-control input-placar placar-away" oninput="salvarPlacar('jogo4')">
+                    <span class="team-name team-away">Sérvia</span>
+                </div>
+            </div>
+
+            <div class="rodada-card">
+                <h3 class="rodada-title">3ª Rodada</h3>
+                
+                <div class="jogo-row" data-id="jogo5">
+                    <span class="team-name team-home">Camarões</span>
+                    <input type="number" min="0" class="form-control input-placar placar-home" oninput="salvarPlacar('jogo5')">
+                    <span class="vs">X</span>
+                    <input type="number" min="0" class="form-control input-placar placar-away" oninput="salvarPlacar('jogo5')">
+                    <span class="team-name team-away">Brasil</span>
+                </div>
+
+                <div class="jogo-row" data-id="jogo6">
+                    <span class="team-name team-home">Sérvia</span>
+                    <input type="number" min="0" class="form-control input-placar placar-home" oninput="salvarPlacar('jogo6')">
+                    <span class="vs">X</span>
+                    <input type="number" min="0" class="form-control input-placar placar-away" oninput="salvarPlacar('jogo6')">
+                    <span class="team-name team-away">Suíça</span>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="col-md-4">
+            <div class="sticky-top" style="top: 20px;">
+                <div class="card shadow-sm">
                     <div class="card-body">
-                        <h4 class="card-title text-center mb-4">Acesso ao Sistema</h4>
-                        <form action="login.php" method="POST">
-                            <div class="mb-3">
-                                <label class="form-label">E-mail</label>
-                                <input type="email" name="email" class="form-control" required>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Senha</label>
-                                <input type="password" name="senha" class="form-control" required>
-                            </div>
-                            <button type="submit" class="btn btn-primary w-100">Entrar</button>
-                        </form>
+                        <h4 class="card-title text-center text-primary mb-3">Escolhas da Pessoa</h4>
+                        <p class="text-muted small text-center">Abaixo você vê um resumo limpo dos palpites preenchidos.</p>
+                        
+                        <div id="resumo-palpites" class="painel-resumo text-center">
+                            <p class="text-muted mb-0">Nenhum placar preenchido ainda.</p>
+                        </div>
+
+                        <div class="d-grid gap-2 mt-3">
+                            <button class="btn btn-outline-danger btn-sm" onclick="limparTudo()">Limpar Todos os Placares</button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
+
+<script>
+    // Função executada ao carregar a página: recupera os dados salvos
+    document.addEventListener("DOMContentLoaded", () => {
+        carregarPlacares();
+        atualizarResumo();
+    });
+
+    // Salva o placar do jogo específico no LocalStorage
+    function salvarPlacar(jogoId) {
+        const jogoRow = document.querySelector(`[data-id="${jogoId}"]`);
+        const homeValue = jogoRow.querySelector('.placar-home').value;
+        const awayValue = jogoRow.querySelector('.placar-away').value;
+
+        const dadosJogo = {
+            home: homeValue,
+            away: awayValue
+        };
+
+        // Salva no LocalStorage transformando o objeto em string
+        localStorage.setItem(jogoId, JSON.stringify(dadosJogo));
+        
+        // Atualiza a barra lateral de resumo em tempo real
+        atualizarResumo();
+    }
+
+    // Carrega os placares quando a página abre ou atualiza
+    function carregarPlacares() {
+        const jogos = document.querySelectorAll('.jogo-row');
+        
+        jogos.forEach(jogo => {
+            const jogoId = jogo.getAttribute('data-id');
+            const dadosSalvos = localStorage.getItem(jogoId);
+
+            if (dadosSalvos) {
+                const placar = JSON.parse(dadosSalvos);
+                jogo.querySelector('.placar-home').value = placar.home;
+                jogo.querySelector('.placar-away').value = placar.away;
+            }
+        });
+    }
+
+    // Lê o que está na tela e monta o resumo visual para você analisar
+    function atualizarResumo() {
+        const resumoContainer = document.getElementById('resumo-palpites');
+        const jogos = document.querySelectorAll('.jogo-row');
+        let htmlResumo = "";
+        let temDados = false;
+
+        jogos.forEach(jogo => {
+            const timeHome = jogo.querySelector('.team-home').innerText;
+            const timeAway = jogo.querySelector('.team-away').innerText;
+            const placarHome = jogo.querySelector('.placar-home').value;
+            const placarAway = jogo.querySelector('.placar-away').value;
+
+            // Só joga pro resumo se pelo menos um dos campos estiver preenchido
+            if (placarHome !== "" || placarAway !== "") {
+                temDados = true;
+                htmlResumo += `<div class="mb-2"><strong>${timeHome}</strong> ${placarHome || 0} x ${placarAway || 0} <strong>${timeAway}</strong></div>`;
+            }
+        });
+
+        if (temDados) {
+            resumoContainer.innerHTML = htmlResumo;
+        } else {
+            resumoContainer.innerHTML = '<p class="text-muted mb-0">Nenhum placar preenchido ainda.</p>';
+        }
+    }
+
+    // Função auxiliar caso queira resetar o simulador
+    function limparTudo() {
+        if (confirm("Tem certeza que deseja apagar todos os palpites?")) {
+            localStorage.clear();
+            const inputs = document.querySelectorAll('.input-placar');
+            inputs.forEach(input => input.value = "");
+            atualizarResumo();
+        }
+    }
+</script>
+
 </body>
 </html>
