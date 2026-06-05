@@ -3,167 +3,324 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador Copa 2026 - Fase de Grupos</title>
+    <title>Simulador Copa 2026 - Todos os 72 Jogos</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        :root { --primary-color: #006241; --secondary-color: #ffcc00; }
-        body { background-color: #f0f2f5; font-family: sans-serif; }
-        .header { background: var(--primary-color); color: white; padding: 2rem 0; margin-bottom: 2rem; border-bottom: 5px solid var(--secondary-color); }
-        .nav-pills .nav-link.active { background-color: var(--primary-color); }
-        .nav-link { color: #333; font-weight: bold; }
-        .jogo-card { background: white; border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: space-between; }
-        .team-box { flex: 1; display: flex; align-items: center; }
-        .team-right { justify-content: flex-end; text-align: right; }
-        .team-name { font-weight: 600; font-size: 0.95rem; margin: 0 10px; }
-        .input-placar { width: 45px; height: 40px; text-align: center; font-weight: bold; font-size: 1.2rem; border: 2px solid #ddd; border-radius: 8px; }
-        .vs { font-weight: bold; color: #999; margin: 0 10px; }
-        #resumo-container { position: sticky; top: 20px; background: white; padding: 20px; border-radius: 12px; border-top: 5px solid var(--primary-color); max-height: 80vh; overflow-y: auto; }
-        .badge-grupo { background: #333; color: white; margin-bottom: 10px; display: inline-block; padding: 2px 10px; border-radius: 4px; font-size: 0.8rem; }
+        :root { 
+            --primary-color: #0f2027; 
+            --secondary-color: #203a43; 
+        }
+        body { 
+            background-color: #f0f2f5; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            padding-bottom: 30px;
+        }
+        .header { 
+            background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%); 
+            color: white; 
+            padding: 40px 0; 
+            text-align: center; 
+            margin-bottom: 30px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+        .grupo-container { 
+            background: white; 
+            border-radius: 12px; 
+            padding: 15px; 
+            margin-bottom: 25px; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05); 
+        }
+        .grupo-header { 
+            background: var(--secondary-color); 
+            color: white; 
+            margin: -15px -15px 15px -15px; 
+            padding: 10px; 
+            border-radius: 12px 12px 0 0; 
+            font-weight: bold; 
+            font-size: 1.1rem; 
+            letter-spacing: 1px;
+        }
+        .jogo-item { 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            padding: 10px 0; 
+            border-bottom: 1px solid #eee; 
+        }
+        .jogo-item:last-child { 
+            border-bottom: none; 
+        }
+        .time-box { 
+            flex: 1; 
+            font-weight: 500; 
+            font-size: 0.95rem; 
+        }
+        .text-right { 
+            text-align: right; 
+            padding-right: 15px;
+        }
+        .text-left {
+            text-align: left;
+            padding-left: 15px;
+        }
+        .placar-input { 
+            width: 45px; 
+            text-align: center; 
+            font-weight: bold; 
+            border: 2px solid #ced4da; 
+            border-radius: 6px; 
+            margin: 0 5px; 
+            padding: 2px;
+        }
+        .placar-input:focus { 
+            border-color: #2c5364; 
+            outline: none; 
+        }
+        #resumo-fixed { 
+            position: sticky; 
+            top: 20px; 
+            background: white; 
+            padding: 20px; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+            max-height: 85vh; 
+            overflow-y: auto; 
+        }
+        .lista-resumo-texto {
+            text-align: left;
+            font-size: 0.9rem;
+            color: #333;
+        }
     </style>
 </head>
 <body>
 
-<div class="header text-center">
-    <h1>🏆 FIFA WORLD CUP 2026</h1>
-    <p>Simulador da Primeira Fase (48 Seleções)</p>
+<div class="header">
+    <h1>SIMULADOR COPA DO MUNDO 2026</h1>
+    <p class="mb-0">Todos os 72 jogos da Fase de Grupos gerados dinamicamente</p>
 </div>
 
 <div class="container-fluid px-4">
     <div class="row">
-        <!-- ÁREA DE JOGOS -->
-        <div class="col-lg-8">
-            <ul class="nav nav-pills mb-4 justify-content-center" id="pills-tab" role="tablist">
-                <li class="nav-item"><button class="nav-link active" data-bs-toggle="pill" data-bs-target="#rodada1">Rodada 1</button></li>
-                <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#rodada2">Rodada 2</button></li>
-                <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#rodada3">Rodada 3</button></li>
-            </ul>
+        <!-- ÁREA DOS JOGOS (Gerada por JS) -->
+        <div class="col-lg-8" id="container-grupos"></div>
 
-            <div class="tab-content" id="pills-tabContent">
-                <div class="tab-pane fade show active" id="rodada1"></div>
-                <div class="tab-pane fade" id="rodada2"></div>
-                <div class="tab-pane fade" id="rodada3"></div>
-            </div>
-        </div>
-
-        <!-- PAINEL DE VISUALIZAÇÃO -->
+        <!-- ÁREA DO RESUMO FIXO -->
         <div class="col-lg-4">
-            <div id="resumo-container" class="shadow">
-                <h4 class="text-center">Minhas Escolhas</h4>
-                <hr>
-                <div id="lista-resumo">
-                    <p class="text-muted text-center">Os placares aparecerão aqui conforme você preencher.</p>
+            <div id="resumo-fixed">
+                <!-- CAMPO DO NOME -->
+                <div class="mb-3">
+                    <label for="nome-usuario" class="form-label fw-bold text-dark">Nome do Participante:</label>
+                    <input type="text" id="nome-usuario" class="form-control" placeholder="Digite seu nome aqui..." oninput="salvarNome()">
                 </div>
-                <button class="btn btn-danger btn-sm w-100 mt-3" onclick="limparTudo()">Limpar Tudo</button>
+                
+                <hr>
+                
+                <h4 class="text-center mb-2 text-dark">Escolhas de <span id="resumo-nome" class="text-primary">Alguém</span></h4>
+                <p class="text-muted text-center small">Conforme você preenche os placares, o resumo limpo aparece abaixo.</p>
+                
+                <div id="lista-resumo" class="lista-resumo-texto text-muted text-center">
+                    Nenhum placar preenchido ainda.
+                </div>
+                
+                <hr>
+                <div class="d-grid gap-2">
+                    <button class="btn btn-outline-danger btn-sm" onclick="limparTudo()">Resetar Tudo</button>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-// Dados oficiais simplificados para o exemplo (Grupos A a L)
-const grupos = [
-    { nome: 'A', times: ['México', 'África do Sul', 'Coreia do Sul', 'Tchéquia'] },
-    { nome: 'B', times: ['Canadá', 'Bósnia e H.', 'Catar', 'Suíça'] },
-    { nome: 'C', times: ['Brasil', 'Marrocos', 'Haiti', 'Escócia'] },
-    { nome: 'D', times: ['EUA', 'Paraguai', 'Austrália', 'Turquia'] },
-    { nome: 'E', times: ['Alemanha', 'Curaçau', 'Costa do Marfim', 'Equador'] },
-    { nome: 'F', times: ['Holanda', 'Japão', 'Suécia', 'Tunísia'] },
-    { nome: 'G', times: ['Bélgica', 'Egito', 'Irã', 'Nova Zelândia'] },
-    { nome: 'H', times: ['Espanha', 'Cabo Verde', 'Arábia Saudita', 'Uruguai'] },
-    { nome: 'I', times: ['França', 'Senegal', 'Iraque', 'Noruega'] },
-    { nome: 'J', times: ['Argentina', 'Argélia', 'Áustria', 'Jordânia'] },
-    { nome: 'K', times: ['Portugal', 'RD Congo', 'Uzbequistão', 'Colômbia'] },
-    { nome: 'L', times: ['Inglaterra', 'Croácia', 'Gana', 'Panamá'] }
+// BANCO DE DADOS COMPLETO DA FASE DE GRUPOS DA COPA 2026 (Todos os 72 jogos)
+const dadosCopa = [
+    { grupo: "A", jogos: [
+        { id: "a1", t1: "México", t2: "África do Sul" }, { id: "a2", t1: "Coreia do Sul", t2: "Tchéquia" },
+        { id: "a3", t1: "México", t2: "Coreia do Sul" }, { id: "a4", t1: "Tchéquia", t2: "África do Sul" },
+        { id: "a5", t1: "África do Sul", t2: "Coreia do Sul" }, { id: "a6", t1: "Tchéquia", t2: "México" }
+    ]},
+    { grupo: "B", jogos: [
+        { id: "b1", t1: "Canadá", t2: "Bósnia" }, { id: "b2", t1: "Catar", t2: "Suíça" },
+        { id: "b3", t1: "Canadá", t2: "Catar" }, { id: "b4", t1: "Suíça", t2: "Bósnia" },
+        { id: "b5", t1: "Bósnia", t2: "Catar" }, { id: "b6", t1: "Suíça", t2: "Canadá" }
+    ]},
+    { grupo: "C", jogos: [
+        { id: "c1", t1: "Brasil", t2: "Marrocos" }, { id: "c2", t1: "Haiti", t2: "Escócia" },
+        { id: "c3", t1: "Brasil", t2: "Haiti" }, { id: "c4", t1: "Escócia", t2: "Marrocos" },
+        { id: "c5", t1: "Marrocos", t2: "Haiti" }, { id: "c6", t1: "Escócia", t2: "Brasil" }
+    ]},
+    { grupo: "D", jogos: [
+        { id: "d1", t1: "EUA", t2: "Paraguai" }, { id: "d2", t1: "Austrália", t2: "Turquia" },
+        { id: "d3", t1: "EUA", t2: "Austrália" }, { id: "d4", t1: "Turquia", t2: "Paraguai" },
+        { id: "d5", t1: "Paraguai", t2: "Austrália" }, { id: "d6", t1: "Turquia", t2: "EUA" }
+    ]},
+    { grupo: "E", jogos: [
+        { id: "e1", t1: "Alemanha", t2: "Curaçau" }, { id: "e2", t1: "Costa do Marfim", t2: "Equador" },
+        { id: "e3", t1: "Alemanha", t2: "Costa do Marfim" }, { id: "e4", t1: "Equador", t2: "Curaçau" },
+        { id: "e5", t1: "Curaçau", t2: "Costa do Marfim" }, { id: "e6", t1: "Equador", t2: "Alemanha" }
+    ]},
+    { grupo: "F", jogos: [
+        { id: "f1", t1: "Holanda", t2: "Japão" }, { id: "f2", t1: "Suécia", t2: "Tunísia" },
+        { id: "f3", t1: "Holanda", t2: "Suécia" }, { id: "f4", t1: "Tunísia", t2: "Japão" },
+        { id: "f5", t1: "Japão", t2: "Suécia" }, { id: "f6", t1: "Tunísia", t2: "Holanda" }
+    ]},
+    { grupo: "G", jogos: [
+        { id: "g1", t1: "Bélgica", t2: "Egito" }, { id: "g2", t1: "Irã", t2: "Nova Zelândia" },
+        { id: "g3", t1: "Bélgica", t2: "Irã" }, { id: "g4", t1: "Nova Zelândia", t2: "Egito" },
+        { id: "g5", t1: "Egito", t2: "Irã" }, { id: "g6", t1: "Nova Zelândia", t2: "Bélgica" }
+    ]},
+    { grupo: "H", jogos: [
+        { id: "h1", t1: "Espanha", t2: "Cabo Verde" }, { id: "h2", t1: "Arábia Saudita", t2: "Uruguai" },
+        { id: "h3", t1: "Espanha", t2: "Arábia Saudita" }, { id: "h4", t1: "Uruguai", t2: "Cabo Verde" },
+        { id: "h5", t1: "Cabo Verde", t2: "Arábia Saudita" }, { id: "h6", t1: "Uruguai", t2: "Espanha" }
+    ]},
+    { grupo: "I", jogos: [
+        { id: "i1", t1: "França", t2: "Senegal" }, { id: "i2", t1: "Iraque", t2: "Noruega" },
+        { id: "i3", t1: "França", t2: "Iraque" }, { id: "i4", t1: "Noruega", t2: "Senegal" },
+        { id: "i5", t1: "Senegal", t2: "Iraque" }, { id: "i6", t1: "Noruega", t2: "França" }
+    ]},
+    { grupo: "J", jogos: [
+        { id: "j1", t1: "Argentina", t2: "Argélia" }, { id: "j2", t1: "Áustria", t2: "Jordânia" },
+        { id: "j3", t1: "Argentina", t2: "Áustria" }, { id: "j4", t1: "Jordânia", t2: "Argélia" },
+        { id: "j5", t1: "Argélia", t2: "Áustria" }, { id: "j6", t1: "Jordânia", t2: "Argentina" }
+    ]},
+    { grupo: "K", jogos: [
+        { id: "k1", t1: "Portugal", t2: "RD do Congo" }, { id: "k2", t1: "Uzbequistão", t2: "Colômbia" },
+        { id: "k3", t1: "Portugal", t2: "Uzbequistão" }, { id: "k4", t1: "Colômbia", t2: "RD do Congo" },
+        { id: "k5", t1: "RD do Congo", t2: "Uzbequistão" }, { id: "k6", t1: "Colômbia", t2: "Portugal" }
+    ]},
+    { grupo: "L", jogos: [
+        { id: "l1", t1: "Inglaterra", t2: "Croácia" }, { id: "l2", t1: "Gana", t2: "Panamá" },
+        { id: "l3", t1: "Inglaterra", t2: "Gana" }, { id: "l4", t1: "Panamá", t2: "Croácia" },
+        { id: "l5", t1: "Croácia", t2: "Gana" }, { id: "l6", t1: "Panamá", t2: "Inglaterra" }
+    ]}
 ];
 
-function gerarJogos() {
-    const r1 = document.getElementById('rodada1');
-    const r2 = document.getElementById('rodada2');
-    const r3 = document.getElementById('rodada3');
+// GERA O HTML AUTOMATICAMENTE NA TELA
+function renderizarTabela() {
+    const container = document.getElementById('container-grupos');
+    let htmlFinal = "";
 
-    grupos.forEach(g => {
-        // Rodada 1: Time 1 x Time 2 | Time 3 x Time 4
-        r1.innerHTML += criarTemplateJogo(g.nome, g.times[0], g.times[1], `R1-${g.nome}-J1`);
-        r1.innerHTML += criarTemplateJogo(g.nome, g.times[2], g.times[3], `R1-${g.nome}-J2`);
-        // Rodada 2: Time 1 x Time 3 | Time 2 x Time 4
-        r2.innerHTML += criarTemplateJogo(g.nome, g.times[0], g.times[2], `R2-${g.nome}-J1`);
-        r2.innerHTML += criarTemplateJogo(g.nome, g.times[1], g.times[3], `R2-${g.nome}-J2`);
-        // Rodada 3: Time 4 x Time 1 | Time 2 x Time 3
-        r3.innerHTML += criarTemplateJogo(g.nome, g.times[3], g.times[0], `R3-${g.nome}-J1`);
-        r3.innerHTML += criarTemplateJogo(g.nome, g.times[1], g.times[2], `R3-${g.nome}-J2`);
+    dadosCopa.forEach(gp => {
+        let htmlGrupo = `<div class="grupo-container"><div class="grupo-header text-center">GRUPO ${gp.grupo}</div>`;
+        
+        gp.jogos.forEach(jogo => {
+            htmlGrupo += `
+                <div class="jogo-item" data-id="${jogo.id}">
+                    <div class="time-box text-right">${jogo.t1}</div>
+                    <div class="d-flex align-items-center">
+                        <input type="number" min="0" class="placar-input p1" oninput="salvarPlacar('${jogo.id}')">
+                        <span class="text-muted small">X</span>
+                        <input type="number" min="0" class="placar-input p2" oninput="salvarPlacar('${jogo.id}')">
+                    </div>
+                    <div class="time-box text-left">${jogo.t2}</div>
+                </div>`;
+        });
+        
+        htmlGrupo += `</div>`;
+        htmlFinal += htmlGrupo;
     });
+
+    container.innerHTML = htmlFinal;
+    carregarPlacares();
+    carregarNome();
 }
 
-function criarTemplateJogo(grupo, t1, t2, id) {
-    return `
-        <div class="jogo-card" data-id="${id}">
-            <div class="team-box team-right">
-                <span class="badge-grupo d-block d-md-none">Grupo ${grupo}</span>
-                <span class="team-name">${t1}</span>
-                <input type="number" min="0" class="input-placar placar-h" oninput="salvar('${id}')">
-            </div>
-            <span class="vs">X</span>
-            <div class="team-box">
-                <input type="number" min="0" class="input-placar placar-a" oninput="salvar('${id}')">
-                <span class="team-name">${t2}</span>
-            </div>
-        </div>
-    `;
+// SALVA O NOME DO PARTICIPANTE
+function salvarNome() {
+    const nomeInput = document.getElementById('nome-usuario').value;
+    localStorage.setItem('copa2026_nome', nomeInput);
+    
+    // Atualiza o título do resumo em tempo real
+    document.getElementById('resumo-nome').innerText = nomeInput.trim() !== "" ? nomeInput : "Alguém";
 }
 
-function salvar(id) {
-    const card = document.querySelector(`[data-id="${id}"]`);
-    const h = card.querySelector('.placar-h').value;
-    const a = card.querySelector('.placar-a').value;
-    localStorage.setItem(id, JSON.stringify({h, a}));
+// CARREGA O NOME SALVO AO REABRIR A PÁGINA
+function carregarNome() {
+    const nomeSalvo = localStorage.getItem('copa2026_nome');
+    if (nomeSalvo) {
+        document.getElementById('nome-usuario').value = nomeSalvo;
+        document.getElementById('resumo-nome').innerText = nomeSalvo;
+    }
+}
+
+// SALVAMENTO AUTOMÁTICO VIA LOCALSTORAGE PARA OS PLACARES
+function salvarPlacar(id) {
+    const linha = document.querySelector(`[data-id="${id}"]`);
+    const p1 = linha.querySelector('.p1').value;
+    const p2 = linha.querySelector('.p2').value;
+
+    const resultado = { p1, p2 };
+    localStorage.setItem('copa2026_' + id, JSON.stringify(resultado));
     atualizarResumo();
 }
 
+// RECUPERA OS PLACARES AO CARREGAR/ATUALIZAR A PÁGINA
+function carregarPlacares() {
+    dadosCopa.forEach(gp => {
+        gp.jogos.forEach(jogo => {
+            const salvo = localStorage.getItem('copa2026_' + jogo.id);
+            if (salvo) {
+                const dados = JSON.parse(salvo);
+                const linha = document.querySelector(`[data-id="${jogo.id}"]`);
+                if (linha) {
+                    linha.querySelector('.p1').value = dados.p1;
+                    linha.querySelector('.p2').value = dados.p2;
+                }
+            }
+        });
+    });
+    atualizarResumo();
+}
+
+// MONTA O PAINEL DE VISUALIZAÇÃO LIMPO NA LATERAL DIREITA
 function atualizarResumo() {
     const lista = document.getElementById('lista-resumo');
-    const cards = document.querySelectorAll('.jogo-card');
-    let html = "";
-    
-    cards.forEach(card => {
-        const id = card.getAttribute('data-id');
-        const h = card.querySelector('.placar-h').value;
-        const a = card.querySelector('.placar-a').value;
-        const t1 = card.querySelectorAll('.team-name')[0].innerText;
-        const t2 = card.querySelectorAll('.team-name')[1].innerText;
+    let resumoHtml = "";
+    let totalPreenchido = 0;
 
-        if (h !== "" || a !== "") {
-            html += `<div class="small border-bottom py-1"><b>${t1}</b> ${h||0} x ${a||0} <b>${t2}</b></div>`;
-        }
+    dadosCopa.forEach(gp => {
+        let grupoHeaderAdicionado = false;
+
+        gp.jogos.forEach(jogo => {
+            const linha = document.querySelector(`[data-id="${jogo.id}"]`);
+            if (!linha) return;
+
+            const v1 = linha.querySelector('.p1').value;
+            const v2 = linha.querySelector('.p2').value;
+
+            if (v1 !== "" || v2 !== "") {
+                if (!grupoHeaderAdicionado) {
+                    resumoHtml += `<div class="fw-bold text-primary mt-2 mb-1">Grupo ${gp.grupo}:</div>`;
+                    grupoHeaderAdicionado = true;
+                }
+                resumoHtml += `<div class="mb-1 border-bottom pb-1">${jogo.t1} <b>${v1 || 0}</b> x <b>${v2 || 0}</b> ${jogo.t2}</div>`;
+                totalPreenchido++;
+            }
+        });
     });
 
-    lista.innerHTML = html || '<p class="text-muted text-center">Nenhum placar preenchido.</p>';
+    if (totalPreenchido > 0) {
+        lista.innerHTML = resumoHtml;
+        lista.classList.remove('text-center', 'text-muted');
+    } else {
+        lista.innerHTML = "Nenhum placar preenchido ainda.";
+        lista.classList.add('text-center', 'text-muted');
+    }
 }
 
-function carregar() {
-    document.querySelectorAll('.jogo-card').forEach(card => {
-        const id = card.getAttribute('data-id');
-        const salvo = localStorage.getItem(id);
-        if (salvo) {
-            const dados = JSON.parse(salvo);
-            card.querySelector('.placar-h').value = dados.h;
-            card.querySelector('.placar-a').value = dados.a;
-        }
-    });
-    atualizarResumo();
-}
-
+// RESET TOTAL DOS DADOS
 function limparTudo() {
-    if(confirm("Deseja apagar todos os palpites?")) {
+    if(confirm("Tem certeza que deseja apagar o nome e todos os palpites?")) {
         localStorage.clear();
         location.reload();
     }
 }
 
-gerarJogos();
-carregar();
-
+// Inicializa o processo ao abrir o arquivo
+renderizarTabela();
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
