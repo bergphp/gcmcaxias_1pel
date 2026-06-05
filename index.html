@@ -91,6 +91,15 @@
             font-size: 0.9rem;
             color: #333;
         }
+        .btn-whatsapp {
+            background-color: #25D366;
+            color: white;
+            font-weight: bold;
+        }
+        .btn-whatsapp:hover {
+            background-color: #1ebd54;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -102,13 +111,10 @@
 
 <div class="container-fluid px-4">
     <div class="row">
-        <!-- ÁREA DOS JOGOS (Gerada por JS) -->
         <div class="col-lg-8" id="container-grupos"></div>
 
-        <!-- ÁREA DO RESUMO FIXO -->
         <div class="col-lg-4">
             <div id="resumo-fixed">
-                <!-- CAMPO DO NOME -->
                 <div class="mb-3">
                     <label for="nome-usuario" class="form-label fw-bold text-dark">Nome do Participante:</label>
                     <input type="text" id="nome-usuario" class="form-control" placeholder="Digite seu nome aqui..." oninput="salvarNome()">
@@ -125,7 +131,8 @@
                 
                 <hr>
                 <div class="d-grid gap-2">
-                    <button class="btn btn-outline-danger btn-sm" onclick="limparTudo()">Resetar Tudo</button>
+                    <button class="btn btn-whatsapp" onclick="enviarWhatsApp()">Enviar Palpites por WhatsApp</button>
+                    <button class="btn btn-outline-danger btn-sm" onclick="limparTudo()">Resetar Todos os Placares</button>
                 </div>
             </div>
         </div>
@@ -227,16 +234,12 @@ function renderizarTabela() {
     carregarNome();
 }
 
-// SALVA O NOME DO PARTICIPANTE
 function salvarNome() {
     const nomeInput = document.getElementById('nome-usuario').value;
     localStorage.setItem('copa2026_nome', nomeInput);
-    
-    // Atualiza o título do resumo em tempo real
     document.getElementById('resumo-nome').innerText = nomeInput.trim() !== "" ? nomeInput : "Alguém";
 }
 
-// CARREGA O NOME SALVO AO REABRIR A PÁGINA
 function carregarNome() {
     const nomeSalvo = localStorage.getItem('copa2026_nome');
     if (nomeSalvo) {
@@ -245,7 +248,6 @@ function carregarNome() {
     }
 }
 
-// SALVAMENTO AUTOMÁTICO VIA LOCALSTORAGE PARA OS PLACARES
 function salvarPlacar(id) {
     const linha = document.querySelector(`[data-id="${id}"]`);
     const p1 = linha.querySelector('.p1').value;
@@ -256,7 +258,6 @@ function salvarPlacar(id) {
     atualizarResumo();
 }
 
-// RECUPERA OS PLACARES AO CARREGAR/ATUALIZAR A PÁGINA
 function carregarPlacares() {
     dadosCopa.forEach(gp => {
         gp.jogos.forEach(jogo => {
@@ -274,7 +275,6 @@ function carregarPlacares() {
     atualizarResumo();
 }
 
-// MONTA O PAINEL DE VISUALIZAÇÃO LIMPO NA LATERAL DIREITA
 function atualizarResumo() {
     const lista = document.getElementById('lista-resumo');
     let resumoHtml = "";
@@ -288,7 +288,7 @@ function atualizarResumo() {
             if (!linha) return;
 
             const v1 = linha.querySelector('.p1').value;
-            const v2 = linha.querySelector('.p2').value;
+            const v2 = presidential = linha.querySelector('.p2').value;
 
             if (v1 !== "" || v2 !== "") {
                 if (!grupoHeaderAdicionado) {
@@ -310,7 +310,49 @@ function atualizarResumo() {
     }
 }
 
-// RESET TOTAL DOS DADOS
+// FUNÇÃO PARA ENVIAR OS DADOS MONTADOS PARA O WHATSAPP
+function enviarWhatsApp() {
+    const nome = document.getElementById('nome-usuario').value.trim() || "Anônimo";
+    let textoMensagem = `*PALPITES DA COPA 2026*\n`;
+    textoMensagem += `*Participante:* ${nome}\n\n`;
+    
+    let temPalpite = false;
+
+    dadosCopa.forEach(gp => {
+        let grupoTexto = `*Grupo ${gp.grupo}:*\n`;
+        let jogoNoGrupo = false;
+
+        gp.jogos.forEach(jogo => {
+            const linha = document.querySelector(`[data-id="${jogo.id}"]`);
+            if (!linha) return;
+
+            const v1 = linha.querySelector('.p1').value;
+            const v2 = linha.querySelector('.p2').value;
+
+            if (v1 !== "" || v2 !== "") {
+                grupoTexto += `• ${jogo.t1} ${v1 || 0} x ${v2 || 0} ${jogo.t2}\n`;
+                jogoNoGrupo = true;
+                temPalpite = true;
+            }
+        });
+
+        if (jogoNoGrupo) {
+            textoMensagem += grupoTexto + `\n`;
+        }
+    });
+
+    if (!temPalpite) {
+        alert("Preencha pelo menos um placar antes de enviar por WhatsApp!");
+        return;
+    }
+
+    // Codifica o texto para o formato de URL do WhatsApp
+    const urlTexto = encodeURIComponent(textoMensagem);
+    
+    // Abre a API do WhatsApp (funciona no PC e Celular)
+    window.open(`https://api.whatsapp.com/send?text=${urlTexto}`, '_blank');
+}
+
 function limparTudo() {
     if(confirm("Tem certeza que deseja apagar o nome e todos os palpites?")) {
         localStorage.clear();
@@ -318,7 +360,6 @@ function limparTudo() {
     }
 }
 
-// Inicializa o processo ao abrir o arquivo
 renderizarTabela();
 </script>
 
